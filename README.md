@@ -1,39 +1,60 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# dio_retry_plus
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+A plugin for [dio](https://pub.dev/packages/dio) that retries failed requests.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
-
 ```dart
-const like = 'sample';
+import 'package:dio_retry_plus/dio_retry_plus.dart';
 ```
 
-## Additional information
+#### Basic configuration
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+final dio = Dio()
+  ..interceptors.add(RetryInterceptor());
+```
+
+#### Global retry options
+
+```dart
+final dio = Dio()
+  ..interceptors.add(RetryInterceptor(
+    options: const RetryOptions(
+      retries: 3, // Number of retries before a failure
+      retryInterval: const Duration(seconds: 1), // Interval between each retry
+      retryEvaluator: (error) => error.type != DioErrorType.CANCEL && error.type != DioErrorType.RESPONSE, // Evaluating if a retry is necessary regarding the error. It is a good candidate for updating authentication token in case of a unauthorized error (be careful with concurrency though)
+    )
+  )
+);
+```
+
+#### Sending a request with options
+
+```dart
+final response = await dio.get("http://www.flutter.dev", options: Options(
+    extra: RetryOptions(
+      retryInterval: const Duration(seconds: 10),
+    ).toExtra(),
+  ));
+```
+
+
+#### Sending a request without retry
+
+```dart
+final response = await dio.get("http://www.flutter.dev", options: Options(
+    extra: RetryOptions.noRetry().toExtra(),
+  ));
+```
+
+#### Logging retry operations
+
+```dart
+final dio = Dio()
+  ..interceptors.add(RetryInterceptor(logger: Logger("Retry")));
+```
+
+## Features and bugs
+
+Please file issues.

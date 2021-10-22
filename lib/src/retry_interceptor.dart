@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
-import 'package:dio_retry/src/http_status_codes.dart';
+import 'http_status_codes.dart';
 
 typedef RetryEvaluator = FutureOr<bool> Function(DioError error, int attempt);
 typedef RefreshTokenFunction = Future<void> Function();
@@ -76,7 +76,8 @@ class RetryInterceptor extends Interceptor {
         await refreshTokenFunction!();
         _isRefreshing = false;
       } else if ((statusCode ?? 500) == 401 && _isRefreshing) {
-        await Future.delayed(moreRequestAwaitDuration ?? const Duration(seconds: 2));
+        await Future.delayed(
+            moreRequestAwaitDuration ?? const Duration(seconds: 2));
       }
     }
     if (error.type == DioErrorType.other) {
@@ -105,10 +106,10 @@ class RetryInterceptor extends Interceptor {
     final delay = _getDelay(attempt);
     logPrint?.call(
       '[${err.requestOptions.uri}] An error occurred during request, '
-          'trying again '
-          '(attempt: $attempt/$retries, '
-          'wait ${delay.inMilliseconds} ms, '
-          'error: ${err.error})',
+      'trying again '
+      '(attempt: $attempt/$retries, '
+      'wait ${delay.inMilliseconds} ms, '
+      'error: ${err.error})',
     );
 
     if (delay != Duration.zero) await Future<void>.delayed(delay);
