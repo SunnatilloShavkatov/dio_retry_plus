@@ -1,5 +1,5 @@
 name: dio_retry_plus
-description: A new Flutter project.
+description: A plugin for dio that retries failed requests.
 version: 0.0.1
 homepage: https://github.com/SunnatilloShavkatov/dio_retry_plus
 
@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  connectivity_plus: any
-  dio: any
+  connectivity_plus: ^2.0.2
+  dio: ^4.0.0
 
 dev_dependencies:
   flutter_test:

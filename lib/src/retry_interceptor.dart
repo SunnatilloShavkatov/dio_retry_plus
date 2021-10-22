@@ -17,7 +17,6 @@ class RetryInterceptor extends Interceptor {
     this.refreshTokenFunction,
     this.accessTokenGetter,
     required this.toNoInternetPageNavigator,
-    this.moreRequestAwaitDuration = const Duration(seconds: 2),
     this.retryDelays = const [
       Duration(seconds: 1),
     ],
@@ -28,9 +27,6 @@ class RetryInterceptor extends Interceptor {
 
   ///refresh token functions get api client
   final RefreshTokenFunction? refreshTokenFunction;
-
-  /// More request await duration
-  final Duration? moreRequestAwaitDuration;
 
   /// Access token getter from storage
   final AccessTokenGetter? accessTokenGetter;
@@ -51,9 +47,6 @@ class RetryInterceptor extends Interceptor {
   /// the last value of [retryDelays] will be used.
   final List<Duration> retryDelays;
 
-  var _isRefreshing = false;
-  var _isNavigatingNoInternet = false;
-
   /// Evaluating if a retry is necessary.regarding the error.
   ///
   /// It can be a good candidate for additional operations too, like
@@ -67,29 +60,25 @@ class RetryInterceptor extends Interceptor {
   /// a bas status code.
   // ignore: avoid-unused-parameters
   FutureOr<bool> defaultRetryEvaluator(DioError error, int attempt) async {
-    bool? shouldRetry;
+    bool shouldRetry;
     if (error.type == DioErrorType.response) {
       final statusCode = error.response?.statusCode;
-      shouldRetry = statusCode != null ? isRetryable(statusCode) : true;
-      if ((statusCode ?? 500) == 401 && !_isRefreshing) {
-        _isRefreshing = true;
-        await refreshTokenFunction!();
-        _isRefreshing = false;
-      } else if ((statusCode ?? 500) == 401 && _isRefreshing) {
-        await Future.delayed(
-            moreRequestAwaitDuration ?? const Duration(seconds: 2));
+      shouldRetry = statusCode != null ? isRetryable(statusCode) : false;
+      if ((statusCode ?? 500) == 401) {
+        refreshTokenFunction!();
       }
     } else if (error.type == DioErrorType.other) {
       var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none &&
-          !_isNavigatingNoInternet) {
-        _isNavigatingNoInternet = true;
+      if (connectivityResult == ConnectivityResult.none) {
         await toNoInternetPageNavigator();
-        _isNavigatingNoInternet = false;
+        shouldRetry = true;
+      } else {
+        shouldRetry = true;
       }
-      shouldRetry = true;
+    } else {
+      shouldRetry = error.type != DioErrorType.cancel;
     }
-    return shouldRetry ?? false;
+    return shouldRetry;
   }
 
   @override
@@ -112,7 +101,6 @@ class RetryInterceptor extends Interceptor {
     );
 
     if (delay != Duration.zero) await Future<void>.delayed(delay);
-
     var header = <String, dynamic>{};
     header.addAll(err.requestOptions.headers);
     if (accessTokenGetter != null) {
