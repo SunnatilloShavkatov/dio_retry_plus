@@ -79,8 +79,7 @@ class RetryInterceptor extends Interceptor {
         await Future.delayed(
             moreRequestAwaitDuration ?? const Duration(seconds: 2));
       }
-    }
-    if (error.type == DioErrorType.other) {
+    } else if (error.type == DioErrorType.other) {
       var connectivityResult = await Connectivity().checkConnectivity();
       if (connectivityResult == ConnectivityResult.none &&
           !_isNavigatingNoInternet) {
