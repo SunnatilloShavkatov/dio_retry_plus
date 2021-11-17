@@ -1,3 +1,17 @@
+## 0.0.4
+
+* TODO: dio and connectivity_plus package update.
+
+## 0.0.3
+
+* TODO: dio package update.
+
+## 0.0.2
+
+* TODO: New initial release.
+
 ## 0.0.1
 
 * TODO: Describe initial release.
+
+
