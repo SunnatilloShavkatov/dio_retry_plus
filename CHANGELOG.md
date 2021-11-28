@@ -1,3 +1,7 @@
+## 0.0.5
+
+* TODO: dio package update.
+
 ## 0.0.4
 
 * TODO: dio and connectivity_plus package update.
