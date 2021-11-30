@@ -1,3 +1,7 @@
+## 0.0.6
+
+* TODO: dio_retry_plus package update.
+
 ## 0.0.5
 
 * TODO: dio package update.
