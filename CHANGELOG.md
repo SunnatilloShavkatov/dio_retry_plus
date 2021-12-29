@@ -1,3 +1,11 @@
+## 0.0.9
+
+* TODO: bug fixed
+
+## 0.0.8
+
+* TODO: connectivity_plus delete
+
 ## 0.0.7
 
 * TODO: dio_retry_plus package update.

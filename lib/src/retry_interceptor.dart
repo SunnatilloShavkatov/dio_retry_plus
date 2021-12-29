@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'http_status_codes.dart';
 
@@ -68,11 +68,15 @@ class RetryInterceptor extends Interceptor {
         refreshTokenFunction!();
       }
     } else if (error.type == DioErrorType.other) {
-      var connectivityResult = await Connectivity().checkConnectivity();
-      if (connectivityResult == ConnectivityResult.none) {
+      try {
+        final result = await InternetAddress.lookup('google.com');
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          shouldRetry = true;
+        } else {
+          shouldRetry = true;
+        }
+      } on SocketException catch (_) {
         await toNoInternetPageNavigator();
-        shouldRetry = true;
-      } else {
         shouldRetry = true;
       }
     } else {
@@ -94,10 +98,10 @@ class RetryInterceptor extends Interceptor {
     final delay = _getDelay(attempt);
     logPrint?.call(
       '[${err.requestOptions.uri}] An error occurred during request, '
-      'trying again '
-      '(attempt: $attempt/$retries, '
-      'wait ${delay.inMilliseconds} ms, '
-      'error: ${err.error})',
+          'trying again '
+          '(attempt: $attempt/$retries, '
+          'wait ${delay.inMilliseconds} ms, '
+          'error: ${err.error})',
     );
 
     if (delay != Duration.zero) await Future<void>.delayed(delay);
@@ -106,7 +110,6 @@ class RetryInterceptor extends Interceptor {
     if (accessTokenGetter != null) {
       header['Authorization'] = accessTokenGetter!();
     }
-    // ignore: unawaited_futures
     err.requestOptions.headers = header;
     try {
       await dio
@@ -115,7 +118,7 @@ class RetryInterceptor extends Interceptor {
     } on DioError catch (e) {
       super.onError(e, handler);
     } catch (e) {
-      logPrint!(e.toString());
+      logPrint!("error: $e");
     }
   }
 
