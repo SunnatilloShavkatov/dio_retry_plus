@@ -16,6 +16,7 @@ class RetryInterceptor extends Interceptor {
     this.retries = 1,
     this.refreshTokenFunction,
     this.accessTokenGetter,
+    this.logOut,
     required this.toNoInternetPageNavigator,
     this.retryDelays = const [
       Duration(seconds: 1),
@@ -27,6 +28,9 @@ class RetryInterceptor extends Interceptor {
 
   ///refresh token functions get api client
   final RefreshTokenFunction? refreshTokenFunction;
+
+  /// log out
+  final Function()? logOut;
 
   /// Access token getter from storage
   final AccessTokenGetter? accessTokenGetter;
@@ -59,13 +63,21 @@ class RetryInterceptor extends Interceptor {
   /// Returns true only if the response hasn't been cancelled or got
   /// a bas status code.
   // ignore: avoid-unused-parameters
-  FutureOr<bool> defaultRetryEvaluator(DioError error, int attempt) async {
+  FutureOr<bool> defaultRetryEvaluator(
+    DioError error,
+    int attempt,
+  ) async {
     bool shouldRetry;
     if (error.type == DioErrorType.response) {
       final statusCode = error.response?.statusCode;
       shouldRetry = statusCode != null ? isRetryable(statusCode) : false;
       if ((statusCode ?? 500) == 401) {
-        refreshTokenFunction!();
+        if (error.requestOptions._refreshCount == 0) {
+          refreshTokenFunction!();
+          error.requestOptions.refreshCount = 1;
+        } else {
+          logOut!();
+        }
       }
     } else if (error.type == DioErrorType.other) {
       try {
@@ -98,10 +110,10 @@ class RetryInterceptor extends Interceptor {
     final delay = _getDelay(attempt);
     logPrint?.call(
       '[${err.requestOptions.uri}] An error occurred during request, '
-          'trying again '
-          '(attempt: $attempt/$retries, '
-          'wait ${delay.inMilliseconds} ms, '
-          'error: ${err.error})',
+      'trying again '
+      '(attempt: $attempt/$retries, '
+      'wait ${delay.inMilliseconds} ms, '
+      'error: ${err.error})',
     );
 
     if (delay != Duration.zero) await Future<void>.delayed(delay);
@@ -133,10 +145,15 @@ class RetryInterceptor extends Interceptor {
 extension RequestOptionsX on RequestOptions {
   static const _kAttemptKey = 'ro_attempt';
   static const _kDisableRetryKey = 'ro_disable_retry';
+  static const _kRefreshKey = 'refresh_token';
 
   int get _attempt => extra[_kAttemptKey] ?? 0;
 
   set _attempt(int value) => extra[_kAttemptKey] = value;
+
+  int get _refreshCount => extra[_kRefreshKey] ?? 0;
+
+  set refreshCount(int value) => extra[_kRefreshKey] = value;
 
   bool get disableRetry => (extra[_kDisableRetryKey] as bool?) ?? false;
 
