@@ -2,6 +2,10 @@
 
 * TODO: log out function
 
+## 1.0.0
+
+* TODO: log out function
+
 ## 0.0.9
 
 * TODO: bug fixed

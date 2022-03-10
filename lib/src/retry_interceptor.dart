@@ -16,7 +16,6 @@ class RetryInterceptor extends Interceptor {
     this.retries = 1,
     this.refreshTokenFunction,
     this.accessTokenGetter,
-    this.logOut,
     required this.toNoInternetPageNavigator,
     this.retryDelays = const [
       Duration(seconds: 1),
@@ -28,9 +27,6 @@ class RetryInterceptor extends Interceptor {
 
   ///refresh token functions get api client
   final RefreshTokenFunction? refreshTokenFunction;
-
-  /// log out
-  final Function()? logOut;
 
   /// Access token getter from storage
   final AccessTokenGetter? accessTokenGetter;
