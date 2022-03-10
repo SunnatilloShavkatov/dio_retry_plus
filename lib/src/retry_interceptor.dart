@@ -72,12 +72,7 @@ class RetryInterceptor extends Interceptor {
       final statusCode = error.response?.statusCode;
       shouldRetry = statusCode != null ? isRetryable(statusCode) : false;
       if ((statusCode ?? 500) == 401) {
-        if (error.requestOptions._refreshCount == 0) {
-          refreshTokenFunction!();
-          error.requestOptions.refreshCount = 1;
-        } else {
-          logOut!();
-        }
+        refreshTokenFunction!();
       }
     } else if (error.type == DioErrorType.other) {
       try {
@@ -145,15 +140,10 @@ class RetryInterceptor extends Interceptor {
 extension RequestOptionsX on RequestOptions {
   static const _kAttemptKey = 'ro_attempt';
   static const _kDisableRetryKey = 'ro_disable_retry';
-  static const _kRefreshKey = 'refresh_token';
 
   int get _attempt => extra[_kAttemptKey] ?? 0;
 
   set _attempt(int value) => extra[_kAttemptKey] = value;
-
-  int get _refreshCount => extra[_kRefreshKey] ?? 0;
-
-  set refreshCount(int value) => extra[_kRefreshKey] = value;
 
   bool get disableRetry => (extra[_kDisableRetryKey] as bool?) ?? false;
 
