@@ -1,6 +1,10 @@
-## 1.0.0
+## 1.0.2 
 
-* TODO: log out function
+* TODO: forbidden function 403
+
+## 1.0.1
+
+* TODO: log out function delete
 
 ## 1.0.0
 

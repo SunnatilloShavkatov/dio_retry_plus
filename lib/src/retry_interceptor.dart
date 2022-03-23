@@ -6,6 +6,7 @@ import 'http_status_codes.dart';
 typedef RetryEvaluator = FutureOr<bool> Function(DioError error, int attempt);
 typedef RefreshTokenFunction = Future<void> Function();
 typedef AccessTokenGetter = String Function();
+typedef ForbiddenFunction = Future<void> Function();
 typedef ToNoInternetPageNavigator = Future<void> Function();
 
 /// An interceptor that will try to send failed request again
@@ -16,6 +17,7 @@ class RetryInterceptor extends Interceptor {
     this.retries = 1,
     this.refreshTokenFunction,
     this.accessTokenGetter,
+    this.forbiddenFunction,
     required this.toNoInternetPageNavigator,
     this.retryDelays = const [
       Duration(seconds: 1),
@@ -27,6 +29,9 @@ class RetryInterceptor extends Interceptor {
 
   ///refresh token functions get api client
   final RefreshTokenFunction? refreshTokenFunction;
+
+  ///refresh token functions get api client
+  final ForbiddenFunction? forbiddenFunction;
 
   /// Access token getter from storage
   final AccessTokenGetter? accessTokenGetter;
@@ -69,6 +74,8 @@ class RetryInterceptor extends Interceptor {
       shouldRetry = statusCode != null ? isRetryable(statusCode) : false;
       if ((statusCode ?? 500) == 401) {
         refreshTokenFunction!();
+      } else if ((statusCode ?? 500) == 403) {
+        forbiddenFunction!();
       }
     } else if (error.type == DioErrorType.other) {
       try {
