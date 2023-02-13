@@ -69,7 +69,7 @@ class RetryInterceptor extends Interceptor {
     int attempt,
   ) async {
     bool shouldRetry;
-    if (error.type == DioErrorType.response) {
+    if (error.type == DioErrorType.badResponse) {
       final statusCode = error.response?.statusCode;
       shouldRetry = statusCode != null ? isRetryable(statusCode) : false;
       if ((statusCode ?? 500) == 401) {
@@ -77,7 +77,7 @@ class RetryInterceptor extends Interceptor {
       } else if ((statusCode ?? 500) == 403) {
         forbiddenFunction!();
       }
-    } else if (error.type == DioErrorType.other) {
+    } else if (error.type == DioErrorType.unknown) {
       try {
         final result = await InternetAddress.lookup('google.com');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
