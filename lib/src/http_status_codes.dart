@@ -93,23 +93,9 @@ const status460ClientClosedRequest = 460;
 
 const retryableStatuses = <int>{
   status401Unauthorized,
-  // status429TooManyRequests,
-  // status500InternalServerError,
   status502BadGateway,
-  // status503ServiceUnavailable,
-  // status504GatewayTimeout,
-  // status440LoginTimeout,
-  // status499ClientClosedRequest,
-  // status460ClientClosedRequest,
-  // status598NetworkReadTimeoutError,
   status599NetworkConnectTimeoutError,
-  // status520WebServerReturnedUnknownError,
-  // status521WebServerIsDown,
   status522ConnectionTimedOut,
-  // status523OriginIsUnreachable,
-  // status524TimeoutOccurred,
-  // status525SSLHandshakeFailed,
-  // status527RailgunError,
 };
 
 bool isRetryable(int statusCode) => retryableStatuses.contains(statusCode);

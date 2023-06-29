@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'http_status_codes.dart';
 
-typedef RetryEvaluator = FutureOr<bool> Function(DioError error, int attempt);
+typedef RetryEvaluator = FutureOr<bool> Function(
+  DioException error,
+  int attempt,
+);
 typedef RefreshTokenFunction = Future<void> Function();
 typedef AccessTokenGetter = String Function();
 typedef ForbiddenFunction = Future<void> Function();
@@ -65,19 +68,19 @@ class RetryInterceptor extends Interceptor {
   /// a bas status code.
   // ignore: avoid-unused-parameters
   FutureOr<bool> defaultRetryEvaluator(
-    DioError error,
+    DioException error,
     int attempt,
   ) async {
     bool shouldRetry;
-    if (error.type == DioErrorType.badResponse) {
+    if (error.type == DioExceptionType.badResponse) {
       final statusCode = error.response?.statusCode;
-      shouldRetry = statusCode != null ? isRetryable(statusCode) : false;
+      shouldRetry = statusCode != null && isRetryable(statusCode);
       if ((statusCode ?? 500) == 401) {
-        refreshTokenFunction!();
+        await refreshTokenFunction!();
       } else if ((statusCode ?? 500) == 403) {
-        forbiddenFunction!();
+        await forbiddenFunction!();
       }
-    } else if (error.type == DioErrorType.unknown) {
+    } else if (error.type == DioExceptionType.unknown) {
       try {
         final result = await InternetAddress.lookup('google.com');
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
@@ -90,13 +93,13 @@ class RetryInterceptor extends Interceptor {
         shouldRetry = true;
       }
     } else {
-      shouldRetry = error.type != DioErrorType.cancel;
+      shouldRetry = error.type != DioExceptionType.cancel;
     }
     return shouldRetry;
   }
 
   @override
-  Future onError(DioError err, ErrorInterceptorHandler handler) async {
+  Future onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.requestOptions.disableRetry) return super.onError(err, handler);
     var attempt = err.requestOptions._attempt + 1;
     final shouldRetry =
@@ -115,20 +118,19 @@ class RetryInterceptor extends Interceptor {
     );
 
     if (delay != Duration.zero) await Future<void>.delayed(delay);
-    var header = <String, dynamic>{};
-    header.addAll(err.requestOptions.headers);
+    var header = <String, dynamic>{}..addAll(err.requestOptions.headers);
     if (accessTokenGetter != null) {
       header['Authorization'] = accessTokenGetter!();
     }
     err.requestOptions.headers = header;
     try {
-      await dio
-          .fetch<void>(err.requestOptions)
-          .then((value) => handler.resolve(value));
-    } on DioError catch (e) {
+      await dio.fetch<void>(err.requestOptions).then(
+            (value) => handler.resolve(value),
+          );
+    } on DioException catch (e) {
       super.onError(e, handler);
     } catch (e) {
-      logPrint!("error: $e");
+      logPrint!('error: $e');
     }
   }
 
