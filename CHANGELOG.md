@@ -1,3 +1,7 @@
+## 2.0.0
+
+* TODO: dio update, flutter migration 3.10.0 sdk
+
 ## 1.0.3 
 
 * TODO: dio update
