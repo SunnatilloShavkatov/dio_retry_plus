@@ -92,6 +92,9 @@ class RetryInterceptor extends Interceptor {
         await toNoInternetPageNavigator();
         shouldRetry = true;
       }
+    } else if (error.type == DioExceptionType.connectionError) {
+      await toNoInternetPageNavigator();
+      shouldRetry = true;
     } else {
       shouldRetry = error.type != DioExceptionType.cancel;
     }
@@ -129,8 +132,6 @@ class RetryInterceptor extends Interceptor {
           );
     } on DioException catch (e) {
       super.onError(e, handler);
-    } on SocketException catch (_) {
-      await toNoInternetPageNavigator();
     } catch (e) {
       logPrint!('error: $e');
     }
