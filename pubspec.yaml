@@ -4,13 +4,13 @@ version: 2.0.0
 homepage: https://github.com/SunnatilloShavkatov/dio_retry_plus
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.10.0"
+  sdk: ">=3.1.0 <4.0.0"
+  flutter: ">=3.13.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.2.1+1
+  dio: ^5.3.3
 
 dev_dependencies:
   flutter_test:

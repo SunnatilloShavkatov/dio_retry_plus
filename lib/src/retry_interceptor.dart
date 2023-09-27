@@ -129,6 +129,8 @@ class RetryInterceptor extends Interceptor {
           );
     } on DioException catch (e) {
       super.onError(e, handler);
+    } on SocketException catch (_) {
+      await toNoInternetPageNavigator();
     } catch (e) {
       logPrint!('error: $e');
     }
