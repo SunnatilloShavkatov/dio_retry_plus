@@ -1,3 +1,7 @@
+## 2.0.1
+
+* TODO: dio update, connection error ad
+
 ## 2.0.0
 
 * TODO: dio update, flutter migration 3.10.0 sdk

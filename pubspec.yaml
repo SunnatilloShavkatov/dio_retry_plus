@@ -1,6 +1,6 @@
 name: dio_retry_plus
 description: A plugin for dio that retries failed requests.
-version: 2.0.0
+version: 2.0.1
 homepage: https://github.com/SunnatilloShavkatov/dio_retry_plus
 
 environment:
