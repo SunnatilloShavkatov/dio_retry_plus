@@ -1,6 +1,10 @@
+## 2.0.2
+
+* TODO: bug fixed
+
 ## 2.0.1
 
-* TODO: dio update, connection error ad
+* TODO: dio update, connection error add
 
 ## 2.0.0
 
