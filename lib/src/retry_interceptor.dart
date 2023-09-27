@@ -4,9 +4,9 @@ import 'package:dio/dio.dart';
 import 'http_status_codes.dart';
 
 typedef RetryEvaluator = FutureOr<bool> Function(
-    DioException error,
-    int attempt,
-    );
+  DioException error,
+  int attempt,
+);
 typedef RefreshTokenFunction = Future<void> Function();
 typedef AccessTokenGetter = String Function();
 typedef ForbiddenFunction = Future<void> Function();
@@ -67,9 +67,9 @@ class RetryInterceptor extends Interceptor {
   /// Returns true only if the response hasn't been cancelled or got
   /// a bas status code.
   Future<bool> defaultRetryEvaluator(
-      DioException error,
-      int attempt,
-      ) async {
+    DioException error,
+    int attempt,
+  ) async {
     bool shouldRetry = false;
     if (error.type == DioExceptionType.badResponse) {
       final statusCode = error.response?.statusCode;
@@ -114,10 +114,10 @@ class RetryInterceptor extends Interceptor {
     final delay = _getDelay(attempt);
     logPrint?.call(
       '[${err.requestOptions.uri}] An error occurred during request, '
-          'trying again '
-          '(attempt: $attempt/$retries, '
-          'wait ${delay.inMilliseconds} ms, '
-          'error: ${err.error})',
+      'trying again '
+      '(attempt: $attempt/$retries, '
+      'wait ${delay.inMilliseconds} ms, '
+      'error: ${err.error})',
     );
 
     if (delay != Duration.zero) await Future<void>.delayed(delay);
@@ -129,7 +129,7 @@ class RetryInterceptor extends Interceptor {
     try {
       await dio.fetch<void>(err.requestOptions).then(
             (value) => handler.resolve(value),
-      );
+          );
     } on DioException catch (e) {
       super.onError(e, handler);
     } on Exception catch (e) {
