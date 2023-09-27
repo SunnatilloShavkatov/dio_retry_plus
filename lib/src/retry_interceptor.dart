@@ -108,6 +108,7 @@ class RetryInterceptor extends Interceptor {
     final attempt = err.requestOptions._attempt + 1;
     final shouldRetry =
         attempt <= retries && await defaultRetryEvaluator(err, attempt);
+
     if (!shouldRetry) return super.onError(err, handler);
 
     err.requestOptions._attempt = attempt;
@@ -130,10 +131,11 @@ class RetryInterceptor extends Interceptor {
       await dio.fetch<void>(err.requestOptions).then(
             (value) => handler.resolve(value),
           );
-    } on DioException catch (e) {
+    } on DioException catch (e, s) {
+      logPrint!('error: $e $s');
       super.onError(e, handler);
-    } on Exception catch (e) {
-      logPrint!('error: $e');
+    } on Exception catch (e, s) {
+      logPrint!('error: $e $s');
     }
   }
 
