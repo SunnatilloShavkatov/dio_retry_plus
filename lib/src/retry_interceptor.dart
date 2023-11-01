@@ -16,7 +16,7 @@ typedef ToNoInternetPageNavigator = Future<void> Function();
 class RetryInterceptor extends Interceptor {
   RetryInterceptor({
     required this.dio,
-    this.logPrint,
+    required this.logPrint,
     this.retries = 1,
     this.refreshTokenFunction,
     this.accessTokenGetter,
@@ -43,7 +43,7 @@ class RetryInterceptor extends Interceptor {
   final ToNoInternetPageNavigator toNoInternetPageNavigator;
 
   /// For logging purpose
-  final void Function(String message)? logPrint;
+  final void Function(String message) logPrint;
 
   /// The number of retry in case of an error
   final int retries;
@@ -113,7 +113,7 @@ class RetryInterceptor extends Interceptor {
 
     err.requestOptions._attempt = attempt;
     final delay = _getDelay(attempt);
-    logPrint?.call(
+    logPrint.call(
       '[${err.requestOptions.uri}] An error occurred during request, '
       'trying again '
       '(attempt: $attempt/$retries, '
@@ -132,10 +132,10 @@ class RetryInterceptor extends Interceptor {
             (value) => handler.resolve(value),
           );
     } on DioException catch (e, s) {
-      logPrint!('error: $e $s');
+      logPrint('error: $e $s');
       super.onError(e, handler);
     } on Exception catch (e, s) {
-      logPrint!('error: $e $s');
+      logPrint('error: $e $s');
     }
   }
 

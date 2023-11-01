@@ -1,3 +1,7 @@
+## 2.0.4
+
+* TODO: logPrint required
+
 ## 2.0.3
 
 * TODO: bug fixed
@@ -14,11 +18,11 @@
 
 * TODO: dio update, flutter migration 3.10.0 sdk
 
-## 1.0.3 
+## 1.0.3
 
 * TODO: dio update
 
-## 1.0.2 
+## 1.0.2
 
 * TODO: forbidden function 403
 
