@@ -1,3 +1,7 @@
+## 2.0.5
+
+* TODO: dio update, minimum dart sdk 3.2.0
+
 ## 2.0.4
 
 * TODO: logPrint required
