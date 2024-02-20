@@ -13,7 +13,7 @@ typedef ForbiddenFunction = Future<void> Function();
 typedef ToNoInternetPageNavigator = Future<void> Function();
 
 /// An interceptor that will try to send failed request again
-class RetryInterceptor extends Interceptor {
+class RetryInterceptor extends InterceptorsWrapper {
   RetryInterceptor({
     required this.dio,
     required this.logPrint,
@@ -54,15 +54,6 @@ class RetryInterceptor extends Interceptor {
   /// If [retries] count more than [retryDelays] count,
   /// the last value of [retryDelays] will be used.
   final List<Duration> retryDelays;
-
-  /// Evaluating if a retry is necessary.regarding the error.
-  ///
-  /// It can be a good candidate for additional operations too, like
-  /// updating authentication token in case of a unauthorized error (be careful
-  /// with concurrency though).
-  ///
-  /// Defaults to [defaultRetryEvaluator].
-  // final RetryEvaluator _retryEvaluator;
 
   /// Returns true only if the response hasn't been cancelled or got
   /// a bas status code.

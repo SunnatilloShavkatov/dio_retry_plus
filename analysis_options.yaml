@@ -251,8 +251,6 @@ linter:
     - avoid_print
     - avoid_private_typedef_functions
     - avoid_return_types_on_setters
-    - avoid_returning_null_for_future
-    - avoid_returning_null
     - avoid_returning_this
     - avoid_setters_without_getters
     - avoid_single_cascade_in_expression_statements
@@ -313,7 +311,6 @@ linter:
     - use_key_in_widget_constructors
     - void_checks
     - always_declare_return_types
-    - always_require_non_null_named_parameters
     - annotate_overrides
     - cast_nullable_to_non_nullable
     - parameter_assignments
