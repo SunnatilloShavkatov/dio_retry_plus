@@ -1,3 +1,7 @@
+## 2.0.7
+
+* TODO: dio update
+
 ## 2.0.6
 
 * TODO: dio update, minimum dart sdk 3.3.0

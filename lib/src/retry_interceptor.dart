@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'http_status_codes.dart';
 
@@ -63,25 +62,13 @@ class RetryInterceptor extends InterceptorsWrapper {
   ) async {
     bool shouldRetry = false;
     if (error.type == DioExceptionType.badResponse) {
-      final statusCode = error.response?.statusCode;
-      shouldRetry = statusCode != null && isRetryable(statusCode);
-      if ((statusCode ?? 500) == 401) {
+      final statusCode = error.response?.statusCode ?? 500;
+      shouldRetry = isRetryable(statusCode);
+      if (statusCode == 401) {
         await refreshTokenFunction!();
         shouldRetry = true;
-      } else if ((statusCode ?? 500) == 403) {
+      } else if (statusCode == 403) {
         await forbiddenFunction!();
-        shouldRetry = true;
-      }
-    } else if (error.type == DioExceptionType.unknown) {
-      try {
-        final result = await InternetAddress.lookup('google.com');
-        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-          shouldRetry = true;
-        } else {
-          shouldRetry = true;
-        }
-      } on SocketException catch (_) {
-        await toNoInternetPageNavigator();
         shouldRetry = true;
       }
     } else if (error.type == DioExceptionType.connectionError) {
