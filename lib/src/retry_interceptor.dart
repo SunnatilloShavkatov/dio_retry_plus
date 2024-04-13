@@ -1,6 +1,6 @@
-import 'dart:async';
-import 'package:dio/dio.dart';
-import 'http_status_codes.dart';
+import "dart:async";
+import "package:dio/dio.dart";
+import "package:dio_retry_plus/src/http_status_codes.dart";
 
 typedef RetryEvaluator = FutureOr<bool> Function(
   DioException error,
@@ -21,7 +21,7 @@ class RetryInterceptor extends InterceptorsWrapper {
     this.accessTokenGetter,
     this.forbiddenFunction,
     required this.toNoInternetPageNavigator,
-    this.retryDelays = const [
+    this.retryDelays = const <Duration>[
       Duration(seconds: 1),
     ],
   });
@@ -62,7 +62,7 @@ class RetryInterceptor extends InterceptorsWrapper {
   ) async {
     bool shouldRetry = false;
     if (error.type == DioExceptionType.badResponse) {
-      final statusCode = error.response?.statusCode ?? 500;
+      final int statusCode = error.response?.statusCode ?? 500;
       shouldRetry = isRetryable(statusCode);
       if (statusCode == 401) {
         await refreshTokenFunction!();
@@ -81,44 +81,56 @@ class RetryInterceptor extends InterceptorsWrapper {
   }
 
   @override
-  Future onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (err.requestOptions.disableRetry) return super.onError(err, handler);
-    final attempt = err.requestOptions._attempt + 1;
-    final shouldRetry =
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    if (err.requestOptions.disableRetry) {
+      return super.onError(err, handler);
+    }
+    final int attempt = err.requestOptions._attempt + 1;
+    final bool shouldRetry =
         attempt <= retries && await defaultRetryEvaluator(err, attempt);
 
-    if (!shouldRetry) return super.onError(err, handler);
+    if (!shouldRetry) {
+      return super.onError(err, handler);
+    }
 
     err.requestOptions._attempt = attempt;
-    final delay = _getDelay(attempt);
+    final Duration delay = _getDelay(attempt);
     logPrint.call(
-      '[${err.requestOptions.uri}] An error occurred during request, '
-      'trying again '
-      '(attempt: $attempt/$retries, '
-      'wait ${delay.inMilliseconds} ms, '
-      'error: ${err.error})',
+      "[${err.requestOptions.uri}] An error occurred during request, "
+      "trying again "
+      "(attempt: $attempt/$retries, "
+      "wait ${delay.inMilliseconds} ms, "
+      "error: ${err.error})",
     );
 
-    if (delay != Duration.zero) await Future<void>.delayed(delay);
-    final header = <String, dynamic>{}..addAll(err.requestOptions.headers);
+    if (delay != Duration.zero) {
+      await Future<void>.delayed(delay);
+    }
+    final Map<String, dynamic> header = <String, dynamic>{}
+      ..addAll(err.requestOptions.headers);
     if (accessTokenGetter != null) {
-      header['Authorization'] = accessTokenGetter!();
+      header["Authorization"] = accessTokenGetter!();
     }
     err.requestOptions.headers = header;
     try {
       await dio.fetch<void>(err.requestOptions).then(
-            (value) => handler.resolve(value),
+            (Response<void> value) => handler.resolve(value),
           );
     } on DioException catch (e, s) {
-      logPrint('error: $e $s');
+      logPrint("error: $e $s");
       super.onError(e, handler);
     } on Exception catch (e, s) {
-      logPrint('error: $e $s');
+      logPrint("error: $e $s");
     }
   }
 
   Duration _getDelay(int attempt) {
-    if (retryDelays.isEmpty) return Duration.zero;
+    if (retryDelays.isEmpty) {
+      return Duration.zero;
+    }
     return attempt - 1 < retryDelays.length
         ? retryDelays[attempt - 1]
         : retryDelays.last;
@@ -126,8 +138,8 @@ class RetryInterceptor extends InterceptorsWrapper {
 }
 
 extension RequestOptionsX on RequestOptions {
-  static const _kAttemptKey = 'ro_attempt';
-  static const _kDisableRetryKey = 'ro_disable_retry';
+  static const String _kAttemptKey = "ro_attempt";
+  static const String _kDisableRetryKey = "ro_disable_retry";
 
   int get _attempt => extra[_kAttemptKey] ?? 0;
 
