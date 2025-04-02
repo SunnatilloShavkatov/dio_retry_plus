@@ -1,20 +1,21 @@
 name: dio_retry_plus
+version: 2.0.8
 description: A plugin for dio that retries failed requests.
-version: 2.0.0
 homepage: https://github.com/SunnatilloShavkatov/dio_retry_plus
 
 environment:
-  sdk: ">=3.1.0 <4.0.0"
-  flutter: ">=3.13.0"
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^5.3.3
+  dio: ^5.8.0+1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.3
+  flutter_lints: ^5.0.0
 
 flutter:
+  uses-material-design: true
