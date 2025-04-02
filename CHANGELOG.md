@@ -1,12 +1,44 @@
+## 2.0.8
+
+* TODO: dio update
+
+## 2.0.7
+
+* TODO: dio update
+
+## 2.0.6
+
+* TODO: dio update, minimum dart sdk 3.3.0
+
+## 2.0.5
+
+* TODO: dio update, minimum dart sdk 3.2.0
+
+## 2.0.4
+
+* TODO: logPrint required
+
+## 2.0.3
+
+* TODO: bug fixed
+
+## 2.0.2
+
+* TODO: bug fixed
+
+## 2.0.1
+
+* TODO: dio update, connection error add
+
 ## 2.0.0
 
 * TODO: dio update, flutter migration 3.10.0 sdk
 
-## 1.0.3 
+## 1.0.3
 
 * TODO: dio update
 
-## 1.0.2 
+## 1.0.2
 
 * TODO: forbidden function 403
 
